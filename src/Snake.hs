@@ -60,15 +60,15 @@ move direction snakeBody =
       actualHead = if collidesWall newHead then collideHead else newHead
    in actualHead : init snakeBody
 
-generateFood :: StdGen -> SnakeBody -> (Food, StdGen)
-generateFood rng snakeBody =
+generateFood :: SnakeBody -> StdGen -> (Food, StdGen)
+generateFood snakeBody rng =
   let rngState = do
         x <- state $ randomR (0, cols - 1)
         y <- state $ randomR (0, rows - 1)
         return (x, y)
       (food, rng') = runState rngState rng
       collidesSnakeBody = food `elem` snakeBody
-   in if collidesSnakeBody then generateFood rng' snakeBody else (food, rng')
+   in if collidesSnakeBody then generateFood snakeBody rng' else (food, rng')
 
 toCorner :: Picture -> Picture
 toCorner = translate x y

@@ -41,7 +41,7 @@ nextFrame dt gameState =
                     if trappedOnFood
                       then fedSnake
                       else movedSnake
-                  (newFood, rng') = generateFood rng actualSnake
+                  (newFood, rng') = generateFood actualSnake rng
                   actualFood =
                     if trappedOnFood
                       then newFood
