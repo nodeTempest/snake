@@ -34,22 +34,12 @@ nextFrame dt gameState =
           if totTime < 1 / speed
             then gameState {_timePassed = totTime}
             else
-              let movedSnake = move direction snakeBody
-                  trappedOnFood = head movedSnake == food
-                  fedSnake = food : snakeBody
-                  actualSnake =
-                    if trappedOnFood
-                      then fedSnake
-                      else movedSnake
-                  (newFood, rng') = generateFood actualSnake rng
-                  actualFood =
-                    if trappedOnFood
-                      then newFood
-                      else food
+              let (newSnake, didConsumeFood) = move direction snakeBody food
+                  (newFood, rng') = if didConsumeFood then generateFood newSnake rng else (food, rng)
                in gameState
-                    { _snakeBody = actualSnake,
+                    { _snakeBody = newSnake,
                       _timePassed = 0,
-                      _food = actualFood,
+                      _food = newFood,
                       _rng = rng'
                     }
 

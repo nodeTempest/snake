@@ -11,6 +11,8 @@ type SnakeBody = [Coords]
 
 type Food = Coords
 
+type DidConsumeFood = Bool
+
 data Direction = GoRight | GoDown | GoLeft | GoUp
 
 data GameState = GameState
@@ -44,10 +46,10 @@ collidesWall (x, y) =
       collidesY = not $ y `elem` [0 .. rows - 1]
    in collidesX || collidesY
 
-move :: Direction -> SnakeBody -> SnakeBody
-move direction snakeBody =
+move :: Direction -> SnakeBody -> Food -> (SnakeBody, DidConsumeFood)
+move direction snakeBody food =
   let (x, y) = head snakeBody
-      newHead = case direction of
+      movedHead = case direction of
         GoRight -> (x + 1, y)
         GoDown -> (x, y + 1)
         GoLeft -> (x - 1, y)
@@ -57,8 +59,13 @@ move direction snakeBody =
         GoDown -> (x, 0)
         GoLeft -> (cols - 1, y)
         GoUp -> (x, rows - 1)
-      actualHead = if collidesWall newHead then collideHead else newHead
-   in actualHead : init snakeBody
+      newHead = if collidesWall movedHead then collideHead else movedHead
+      movedSnake = newHead : init snakeBody
+      didTrapOnFood = head movedSnake == food
+      fedSnake = food : snakeBody
+   in if didTrapOnFood
+        then (fedSnake, True)
+        else (movedSnake, False)
 
 generateFood :: SnakeBody -> StdGen -> (Food, StdGen)
 generateFood snakeBody rng =
@@ -87,8 +94,8 @@ drawSquare (x, y) = translate x' y' $ square
 
 drawSnake :: SnakeBody -> Picture
 drawSnake snakeBody =
-  let snakeTail = map (snakeTailColor . drawSquare) $ tail snakeBody
-      snakeHead = snakeHeadColor . drawSquare $ head snakeBody
+  let snakeHead = snakeHeadColor . drawSquare $ head snakeBody
+      snakeTail = map (snakeTailColor . drawSquare) $ tail snakeBody
    in pictures $ snakeHead : snakeTail
 
 drawFood :: Food -> Picture
