@@ -1,9 +1,26 @@
-module Model where
+module Snake where
 
 import Config
 import Control.Monad.State.Lazy
+import Graphics.Gloss
 import System.Random
-import Types
+
+type Coords = (Int, Int)
+
+type SnakeBody = [Coords]
+
+type Food = Coords
+
+data Direction = GoRight | GoDown | GoLeft | GoUp
+
+data GameState = GameState
+  { _snakeBody :: SnakeBody,
+    _timePassed :: Float,
+    _direction :: Direction,
+    _food :: Food,
+    _rng :: StdGen,
+    _paused :: Bool
+  }
 
 initialState :: GameState
 initialState =
@@ -52,3 +69,27 @@ generateFood rng snakeBody =
       (food, rng') = runState rngState rng
       collidesSnakeBody = food `elem` snakeBody
    in if collidesSnakeBody then generateFood rng' snakeBody else (food, rng')
+
+toCorner :: Picture -> Picture
+toCorner = translate x y
+  where
+    x = - fromIntegral winWidth / 2 + halfSquare
+    y = fromIntegral winHeight / 2 - halfSquare
+    halfSquare = fromIntegral squareSize / 2
+
+drawSquare :: Coords -> Picture
+drawSquare (x, y) = translate x' y' $ square
+  where
+    x' = fromIntegral (x * squareSize)
+    y' = - fromIntegral (y * squareSize)
+    squareSize' = fromIntegral squareSize
+    square = rectangleSolid squareSize' squareSize'
+
+drawSnake :: SnakeBody -> Picture
+drawSnake snakeBody =
+  let snakeTail = map (snakeTailColor . drawSquare) $ tail snakeBody
+      snakeHead = snakeHeadColor . drawSquare $ head snakeBody
+   in pictures $ snakeHead : snakeTail
+
+drawFood :: Food -> Picture
+drawFood = foodColor . drawSquare

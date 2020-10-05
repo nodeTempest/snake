@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9dffa124ac962b94dcc3965650970bf8789e9d12e2564774fbb683a71d705ac9
+-- hash: 59995aeb15577b619c003137d031943135e11d6a5b2a88b44daebe66f9bcc2b4
 
 name:           snake
 version:        0.1.0.0
@@ -28,10 +28,7 @@ source-repository head
 library
   exposed-modules:
       Config
-      Controller
-      Model
-      Types
-      View
+      Snake
   other-modules:
       Paths_snake
   hs-source-dirs:
